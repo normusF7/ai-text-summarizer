@@ -1,16 +1,40 @@
-﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+﻿@namespace SharedUI.Layout
+@inherits LayoutComponentBase
 
+<div class="page">
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            <h1>AI Photo Editor</h1>
+            <div>
+                <a href="/">Home</a>
+                <a href="/editor" class="ml-3">Editor</a>
+            </div>
         </div>
-
+        
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+<style>
+    .top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .ml-3 {
+        margin-left: 12px;
+    }
+    
+    .top-row a {
+        color: #0366d6;
+        text-decoration: none;
+        margin-left: 16px;
+    }
+    
+    .top-row a:hover {
+        text-decoration: underline;
+    }
+</style>

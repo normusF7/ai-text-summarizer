@@ -1,0 +1,139 @@
+﻿@page "/editor"
+@namespace Pages
+@inherits ComponentBase
+
+<div class="image-editor-container">
+    <div class="upload-section">
+        <h2>Upload Your Photo</h2>
+        <div class="upload-area @(isFileSelected ? "has-file" : "")">
+            <InputFile OnChange="@LoadFile" class="input-file" accept=".jpg,.jpeg,.png" />
+            <div class="upload-placeholder">
+                @if (!isFileSelected)
+                {
+                    <span>Click or drag to upload an image</span>
+                }
+                else
+                {
+                    <img src="@imageDataUrl" alt="Uploaded image" class="preview-image" />
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="prompt-section">
+        <h2>Edit Instructions</h2>
+        <textarea @bind="promptText" 
+                  placeholder="Describe how you want the image to be edited..."
+                  class="prompt-input"></textarea>
+    </div>
+
+    <div class="action-section">
+        <button @onclick="ProcessImage" 
+                disabled="@(!isFileSelected)" 
+                class="edit-button">
+            @(isProcessing ? "Processing..." : "Edit Image")
+        </button>
+    </div>
+
+    @if (isProcessed)
+    {
+        <div class="result-section">
+            <h2>Edited Result</h2>
+            <div class="result-image-container">
+                <img src="@resultImageUrl" alt="Edited image" class="result-image" />
+            </div>
+            <button @onclick="DownloadResult" class="download-button">Download</button>
+        </div>
+    }
+</div>
+
+<style>
+    .image-editor-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .upload-section, .prompt-section, .action-section, .result-section {
+        margin-bottom: 30px;
+    }
+
+    .upload-area {
+        position: relative;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        transition: all 0.3s;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .upload-area:hover {
+        border-color: #0366d6;
+        background-color: #f0f8ff;
+    }
+
+    .upload-area.has-file {
+        border-style: solid;
+    }
+
+    .input-file {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .preview-image {
+        max-width: 100%;
+        max-height: 300px;
+    }
+
+    .prompt-input {
+        width: 100%;
+        min-height: 100px;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        resize: vertical;
+    }
+
+    .edit-button, .download-button {
+        padding: 12px 24px;
+        font-size: 16px;
+        background-color: #0366d6;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .edit-button:hover, .download-button:hover {
+        background-color: #0257ba;
+    }
+
+    .edit-button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+
+    .result-image-container {
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .result-image {
+        max-width: 100%;
+    }
+</style>
