@@ -10,7 +10,7 @@ namespace TextSummariser.Pages
 {
     public partial class TextFileProcessor : ComponentBase, IDisposable
     {
-        private readonly TextProcessingResult _result = new();
+        private readonly SummaryState _state = new();
         private readonly ApiSettings _apiSettings = new();
         
         private bool _isFileSelected;
@@ -47,9 +47,9 @@ namespace TextSummariser.Pages
             _cancellationTokenSource?.Dispose();
         }
         
-        private async Task LoadFile(InputFileChangeEventArgs e)
+        private async Task LoadFile(InputFileChangeEventArgs eventArgs)
         {
-            var file = e.File;
+            var file = eventArgs.File;
 
             try
             {
@@ -57,7 +57,7 @@ namespace TextSummariser.Pages
             }
             catch (Exception exception)
             {
-                _result.ErrorMessage = $"Error loading file: {exception.Message}";
+                _state.SetError($"Error loading file: {exception.Message}");
                 _isFileSelected = false;
             }
         }
@@ -66,7 +66,7 @@ namespace TextSummariser.Pages
         {                    
             if (file.ContentType != AppConstants.ExpectedContentType)
             {
-                _result.ErrorMessage = "Please select a text (.txt) file.";
+                _state.SetError("Please select a text (.txt) file.");
                 _isFileSelected = false;
                 return;
             }
@@ -75,17 +75,14 @@ namespace TextSummariser.Pages
             {
                 await using var stream = file.OpenReadStream(maxAllowedSize: AppConstants.MaxFileSize);
                 using var reader = new StreamReader(stream);
-                _result.FileContent = await reader.ReadToEndAsync();
+                var content = await reader.ReadToEndAsync();
 
-                _result.FileName = file.Name;
-                _result.Status = ProcessingStatus.NotStarted;
-                _result.SummaryText = string.Empty;
-                _result.ErrorMessage = null;
+                _state.SetFile(file.Name, content);
                 _isFileSelected = true;
             }
             catch (Exception exception)
             {
-                _result.ErrorMessage = $"Failed to read file: {exception.Message}";
+                _state.SetError($"Failed to read file: {exception.Message}");
                 _isFileSelected = false;
                 throw;
             }
@@ -95,18 +92,16 @@ namespace TextSummariser.Pages
         {
             if (!_isFileSelected)
             {
-                _result.ErrorMessage = "Please select a text file.";
+                _state.SetError("Please select a text file.");
                 return;
             }
-            
+
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource?.Dispose();
             _cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = _cancellationTokenSource.Token;
 
-            _result.Status = ProcessingStatus.Processing;
-            _result.ErrorMessage = null;
-            _result.SummaryText = string.Empty;
+            _state.StartProcessing();
             await InvokeAsync(StateHasChanged);
 
             try
@@ -115,14 +110,14 @@ namespace TextSummariser.Pages
                 {
                     throw new InvalidOperationException("Gemini API key is not configured. Please add it to your application settings.");
                 }
-                
+
                 if (_apiSettings.RememberApiKey)
                 {
                     await SaveApiKeyAsync();
                 }
 
                 var summaryText = await TextProcessingService.GenerateSummaryAsync(
-                    _result.FileContent,
+                    _state.FileContent,
                     _apiSettings.GeminiApiKey);
 
                 if (!string.IsNullOrEmpty(summaryText) && !cancellationToken.IsCancellationRequested)
@@ -131,8 +126,7 @@ namespace TextSummariser.Pages
                 }
                 else if (!cancellationToken.IsCancellationRequested)
                 {
-                    _result.SummaryText = "No response generated.";
-                    _result.Status = ProcessingStatus.Completed;
+                    _state.CompleteProcessing("No response generated.");
                     await InvokeAsync(StateHasChanged);
                 }
             }
@@ -140,18 +134,18 @@ namespace TextSummariser.Pages
             {
                 Debug.WriteLine("Text processing operation was canceled");
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
                 if (!cancellationToken.IsCancellationRequested)
                 {
-                    _result.ErrorMessage = $"An error occurred: {ex.Message}";
+                    _state.SetError($"An error occurred: {exception.Message}");
                 }
             }
             finally
             {
-                if (!cancellationToken.IsCancellationRequested)
+                if (!cancellationToken.IsCancellationRequested && _state.Status == ProcessingStatus.Processing)
                 {
-                    _result.Status = ProcessingStatus.Completed;
+                    _state.Status = ProcessingStatus.Completed;
                     await InvokeAsync(StateHasChanged);
                 }
             }
@@ -159,39 +153,39 @@ namespace TextSummariser.Pages
         
         private async Task PrintResponseAsync(string fullResponse, CancellationToken cancellationToken)
         {
-            _result.SummaryText = string.Empty;
+            var summary = string.Empty;
 
             foreach (var character in fullResponse)
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                _result.SummaryText += character;
-                _result.Status = ProcessingStatus.Completed;
+                summary += character;
+                _state.CompleteProcessing(summary);
                 await InvokeAsync(StateHasChanged);
                 await Task.Delay(1, cancellationToken);
             }
         }
-        
+
         private async Task CopySummary()
         {
-            if (string.IsNullOrEmpty(_result.SummaryText))
+            if (string.IsNullOrEmpty(_state.SummaryText))
             {
                 return;
             }
 
             try
             {
-                var success = await JsRuntime.InvokeAsync<bool>("clipboardInterop.copyToClipboard", _result.SummaryText);
-                
+                var success = await JsRuntime.InvokeAsync<bool>("copyToClipboard", _state.SummaryText);
+
                 if (!success)
                 {
-                    _result.ErrorMessage = "Failed to copy to clipboard. Please try again or copy manually.";
+                    _state.SetError("Failed to copy to clipboard. Please try again or copy manually.");
                 }
             }
             catch (Exception ex)
             {
-                _result.ErrorMessage = $"Failed to copy: {ex.Message}";
+                _state.SetError($"Failed to copy: {ex.Message}");
             }
             finally
             {
@@ -212,9 +206,9 @@ namespace TextSummariser.Pages
                     await LocalStorage.RemoveItemAsync(AppConstants.ApiKeyStorageKey);
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Debug.WriteLine($"Error saving API key: {ex.Message}");
+                Debug.WriteLine($"Error saving API key: {exception.Message}");
             }
         }
     }

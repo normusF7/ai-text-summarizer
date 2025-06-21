@@ -26,18 +26,18 @@ else
                 {
                     <div class="file-info">
                         <i class="file-icon">📝</i>
-                        <span class="file-name">@_result.FileName</span>
+                        <span class="file-name">@_state.FileName</span>
                     </div>
                 }
             </div>
         </div>
     </div>
     
-    <div class="prompt-section">
+    <div class="api-section">
         <h2>API Configuration</h2>
         <textarea @bind="_apiSettings.GeminiApiKey" 
                   placeholder="Gemini API token"
-                  class="prompt-input"></textarea>
+                  class="api-input"></textarea>
         <div class="remember-key-option">
             <input type="checkbox" id="rememberKey" @bind="_apiSettings.RememberApiKey" />
             <label for="rememberKey">Remember API key on this device</label>
@@ -46,35 +46,36 @@ else
 
     <div class="action-section">
         <button @onclick="ProcessFile" 
-                disabled="@(!_isFileSelected || _result.Status == ProcessingStatus.Processing)" 
+                disabled="@(!_isFileSelected || _state.Status == ProcessingStatus.Processing)" 
                 class="process-button">
-            @(_result.Status == ProcessingStatus.Processing ? "Processing..." : "Summarize Text")
+            @(_state.Status == ProcessingStatus.Processing ? "Processing..." : "Summarize Text")
         </button>
     </div>
-    
-    @if (!string.IsNullOrEmpty(_result.ErrorMessage))
+
+    @if (_state.HasError)
     {
         <div class="error-message">
-            @_result.ErrorMessage
+            @_state.ErrorMessage
         </div>
     }
 
-    @if (_result.Status != ProcessingStatus.NotStarted)
+    @if (_state.Status != ProcessingStatus.NotStarted)
     {
         <div class="result-section">
-            <h2>@(_result.Status == ProcessingStatus.Processing ? "Generating Summary..." : "Text Summary")</h2>
+            <h2>@(_state.Status == ProcessingStatus.Processing ? "Generating Summary..." : "Text Summary")</h2>
             <div class="summary-container">
-                <pre class="summary-text">@_result.SummaryText</pre>
-                @if (_result.Status == ProcessingStatus.Processing)
+                <pre class="summary-text">@_state.SummaryText</pre>
+                @if (_state.Status == ProcessingStatus.Processing)
                 {
                     <div class="cursor-blink"></div>
                 }
             </div>
-            @if (_result.Status == ProcessingStatus.Completed && !string.IsNullOrEmpty(_result.SummaryText))
+            @if (_state.Status == ProcessingStatus.Completed && _state.HasSummary)
             {
                 <button @onclick="CopySummary" class="copy-button">Copy Summary</button>
             }
         </div>
     }
 </div>
+}
 }

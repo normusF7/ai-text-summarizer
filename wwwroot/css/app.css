@@ -126,14 +126,14 @@ main {
     padding: 1rem 1rem 1rem 3.7rem;
     color: white;
 }
-/* Text Processor Component Styles */
+
 .text-processor-container {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
 }
 
-.upload-section, .prompt-section, .action-section, .result-section {
+.upload-section, .api-section, .action-section, .result-section {
     margin-bottom: 30px;
 }
 
@@ -187,13 +187,12 @@ main {
     font-weight: bold;
 }
 
-.prompt-input {
+.api-input {
     width: 100%;
-    min-height: 100px;
+    min-height: 50px;
     padding: 12px;
     border-radius: 8px;
     border: 1px solid #ccc;
-    resize: vertical;
 }
 
 .process-button, .copy-button {

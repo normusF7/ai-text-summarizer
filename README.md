@@ -1,14 +1,14 @@
-﻿# Text Summarizer
+﻿# AI Text Summarizer
 
-A Blazor WebAssembly application that uses Generative AI to summarize text files.
+A Blazor WebAssembly application that leverages Google's Gemini AI to provide intelligent summarization of text files.
 
 ## Features
 
 - Upload and process text files (.txt format)
-- Summarize text content using Google's Gemini AI
-- Typewriter-style animated rendering of summary text
+- Generate concise summaries using Google's Gemini AI
 - Save API keys in browser local storage
-- Copy summary to clipboard
+- Copy generated summaries to clipboard with one click
+- Clean, responsive user interface
 
 ## Prerequisites
 
@@ -39,7 +39,7 @@ A Blazor WebAssembly application that uses Generative AI to summarize text files
 - **Models**: Data models and DTOs
   - **Config**: Configuration-related models
   - **ProcessingStatus.cs**: Enum for processing state
-  - **TextProcessingResult.cs**: Result model for text processing
+  - **SummaryState.cs**: Core state management for the summarization process
 
 - **Services**: Business logic and external integrations
   - **ITextProcessingService.cs**: Interface for text processing
@@ -49,6 +49,9 @@ A Blazor WebAssembly application that uses Generative AI to summarize text files
 
 - **Pages**: Blazor pages
   - **TextFileProcessor.razor**: Main file processing component
+
+- **Layout**: Application layout components
+  - **MainLayout.razor**: Main application layout
 
 ## License
 
