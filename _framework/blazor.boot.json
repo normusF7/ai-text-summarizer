@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "TextSummariser",
   "resources": {
-    "hash": "sha256-qTnZqGt0qOi2r/adKFQNLObdh0nEA5A+XQlQwAEDYSE=",
+    "hash": "sha256-jLblPd+JUcm7UhRQqL3FPKK2DlUOLF6KdWauqtqKZ+4=",
     "fingerprinting": {
       "GenerativeAI.ex7dboz3pg.wasm": "GenerativeAI.wasm",
       "Microsoft.AspNetCore.Components.0dtlnzp4br.wasm": "Microsoft.AspNetCore.Components.wasm",
@@ -45,7 +45,7 @@
       "System.Web.HttpUtility.3ehg3jgpuh.wasm": "System.Web.HttpUtility.wasm",
       "System.cunp5qiwjj.wasm": "System.wasm",
       "System.Private.CoreLib.75qv5ka0z9.wasm": "System.Private.CoreLib.wasm",
-      "TextSummariser.65pc8hols1.wasm": "TextSummariser.wasm",
+      "TextSummariser.dbv4fx8yns.wasm": "TextSummariser.wasm",
       "dotnet.js": "dotnet.js",
       "dotnet.native.rtblh4npr3.js": "dotnet.native.js",
       "dotnet.native.aqhezbunpl.wasm": "dotnet.native.wasm",
@@ -113,7 +113,7 @@
       "System.Text.RegularExpressions.1545wynqc3.wasm": "sha256-NXz2+YGTMV08/9ctPUQuzAo2X5/GnIuUXlWZreOG22k=",
       "System.Web.HttpUtility.3ehg3jgpuh.wasm": "sha256-CwuaWh1oo2hLyU9/oGKvJC6rdOd3BbjrXl5nUwcWW4U=",
       "System.cunp5qiwjj.wasm": "sha256-DM5iEENhrifGKn33Y7cqRzxC0OtHXYOKO13icwIazj8=",
-      "TextSummariser.65pc8hols1.wasm": "sha256-tkkwv8i/60TEEXJEVOMfamLnRnGIDu7PfKDj2loZq0k="
+      "TextSummariser.dbv4fx8yns.wasm": "sha256-iQrXPZ0QQfgNQo3ZfjbOizssNPTj+E1YT6WIU2mev2c="
     }
   },
   "cacheBootResources": true,
